@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi-Agent Workflow Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    textarea { width: 100%; height: 80px; }
+    button { margin-top: 10px; padding: 8px 16px; }
+    .agent-box { border: 1px solid #ccc; padding: 10px; margin-top: 10px; border-radius: 4px; }
+    .agent-title { font-weight: bold; margin-bottom: 5px; }
+    #status { margin-top: 10px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>Multi-Agent Workflow</h1>
+
+  <label for="prompt">Enter an idea or topic to generate essay about:</label>
+  <textarea id="prompt" placeholder="Enter idea/topic here..."></textarea>
+  <br />
+  <button id="run-btn">Run Workflow</button>
+
+  <div id="status"></div>
+
+  <div class="agent-box">
+    <div class="agent-title">Agent A (Planner)</div>
+    <pre id="agent-a-output"></pre>
+  </div>
+
+  <div class="agent-box">
+    <div class="agent-title">Agent B (Researcher)</div>
+    <pre id="agent-b-output"></pre>
+  </div>
+
+  <div class="agent-box">
+    <div class="agent-title">Agent C (Rough Draft Writer)</div>
+    <div id="agent-c-output"></div>
+  </div>
+
+  <div class="agent-box">
+    <div class="agent-title">Agent D (Editor / Final)</div>
+    <div id="agent-d-output"></div>
+  </div>
+
+  <script>
+    const runBtn = document.getElementById('run-btn');
+    const statusDiv = document.getElementById('status');
+
+    runBtn.addEventListener('click', async () => {
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) {
+        statusDiv.textContent = 'Please enter an idea first.';
+        return;
+      }
+
+      statusDiv.textContent = 'Running workflow...';
+
+      document.getElementById('agent-a-output').textContent = '';
+      document.getElementById('agent-b-output').textContent = '';
+      document.getElementById('agent-c-output').textContent = '';
+      document.getElementById('agent-d-output').innerHTML = '';
+
+      try {
+        const response = await fetch('/run_workflow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt })
+        });
+
+        if (!response.ok) {
+          throw new Error('Server error: ' + response.status);
+        }
+
+        const data = await response.json();
+
+        document.getElementById('agent-a-output').textContent = data.agent_outputs.A;
+        document.getElementById('agent-b-output').textContent = data.agent_outputs.B;
+        document.getElementById('agent-c-output').textContent = data.agent_outputs.C;
+
+        function nl2br(str) {
+            return str.replace(/\n/g, '<br>');
+        }
+        document.getElementById('agent-d-output').innerHTML = nl2br(data.agent_outputs.D);
+
+        statusDiv.textContent = 'Done.';
+      } catch (err) {
+        console.error(err);
+        statusDiv.textContent = 'Error running workflow. Check console/logs.';
+      }
+    });
+  </script>
+</body>
+</html>
