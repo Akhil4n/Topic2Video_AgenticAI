@@ -56,8 +56,9 @@ def agent_b_scene_planner(outline_text: str) -> str:
         "For each scene:\n"
         "- Scene number and title\n"
         "- Time range\n"
-        "- Visual description with camera motion ONLY\n"
-        "NO on-screen text, subtitles, or words. Pure visuals."
+        "- SIMPLE motion + camera description ONLY\n"
+        "NO colors, lighting, textures, or visual details. Structure only.\n"
+        "Example: 'Scene 1: Intro (0-3s) - Camera zooms toward object'"
     )
     return call_openai_agent(instructions, outline_text)
 
