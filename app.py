@@ -10,7 +10,6 @@ import re
 
 load_dotenv()
 
-# Create videos folder
 os.makedirs("videos", exist_ok=True)
 
 app = Flask(__name__)
@@ -84,7 +83,6 @@ def generate_video_from_prompt(prompt: str, user_topic: str) -> dict:
             }
         )
         
-        # Save to videos/ folder with topic name
         filename = get_video_filename(user_topic)
         print(f"Downloading to: {filename}")
         video_content = requests.get(str(output), timeout=30).content
